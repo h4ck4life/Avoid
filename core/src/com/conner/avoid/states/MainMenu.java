@@ -2,57 +2,81 @@ package com.conner.avoid.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.conner.avoid.Application;
 import com.conner.avoid.handlers.GameStateManager;
-import com.conner.avoid.utils.GameButton;
 
 public class MainMenu extends GameState {
 
-	private GameButton playButton, highscoreButton, settingsButton, quitButton;
+	private Stage stage;
+	private Table table;
+	private Skin skin;
+	private TextButton buttonPlay, buttonExit;
+	private TextureAtlas atlas;
+	private BitmapFont black;
 	
-	public MainMenu(GameStateManager gsm) {
+	public MainMenu(final GameStateManager gsm) {
 		super(gsm);
+
+		black = Application.font;
 		
-		camera.setToOrtho(false, Application.V_WIDTH, Application.V_HEIGHT);
+		atlas = new TextureAtlas("ui/button2.pack");
+		skin = new Skin(atlas);
 		
-		Texture tex = Application.res.getTexture("hud");
-		playButton = new GameButton(new TextureRegion(tex, 0,0,0,0), 160, 100, camera);
-		playButton.setText("0");
-		highscoreButton = new GameButton(new TextureRegion(tex, 0,0,0,0), 160, 80, camera);
-		highscoreButton.setText("1");
-		settingsButton = new GameButton(new TextureRegion(tex, 0,0,0,0), 160, 60, camera);
-		settingsButton.setText("2");
-		quitButton = new GameButton(new TextureRegion(tex, 0,0,0,0), 160, 40, camera);
-		quitButton.setText("3");
+		stage = new Stage();
+
+		Gdx.input.setInputProcessor(stage);
+		
+		table = new Table(skin);
+		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		TextButtonStyle tbs = new TextButtonStyle();
+		tbs.up = skin.getDrawable("button.normal");
+		tbs.down = skin.getDrawable("button.pressed");
+		tbs.pressedOffsetX = 1;
+		tbs.pressedOffsetY = -1;
+		tbs.font = black;
+		black.setScale(Application.SCALE);
+		
+		buttonPlay = new TextButton("Play", tbs);
+		buttonPlay.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				stage.clear();
+				gsm.setState(GameStateManager.PLAY);
+			}
+		});
+		buttonExit = new TextButton("Quit", tbs);
+		buttonExit.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				Gdx.app.exit();
+			}
+		});
+		
+		table.add(buttonPlay).width(300).pad(30);
+		table.row();
+		table.add(buttonExit).width(300).pad(30);
+		stage.addActor(table);
 	}
 
 	@Override
 	public void handleInput() {
-		if(playButton.isClicked()) {
-			System.out.println("BUTTS");
-			gsm.setState(GameStateManager.PLAY);
-		}
-		if(highscoreButton.isClicked()) {
-			gsm.setState(GameStateManager.HIGHSCORE);
-		}
-		if(settingsButton.isClicked()) {
-			
-		}
-		if(quitButton.isClicked()) {
-			System.exit(0);
-		}
+		
 	}
 
 	@Override
 	public void update(float dt) {
 		handleInput();
-		
-		playButton.update(dt);
-		highscoreButton.update(dt);
-		settingsButton.update(dt);
-		quitButton.update(dt);
+		stage.act(dt);
 	}
 
 	@Override
@@ -60,12 +84,7 @@ public class MainMenu extends GameState {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		
-		batch.setProjectionMatrix(camera.combined);
-		
-		playButton.render(batch);
-		highscoreButton.render(batch);
-		settingsButton.render(batch);
-		quitButton.render(batch);
+		stage.draw();
 	}
 
 	@Override

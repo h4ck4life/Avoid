@@ -1,6 +1,7 @@
 package com.conner.avoid.utils;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,9 +26,10 @@ public class Cache {
 		if(tex != null) tex.dispose();
 	}
 	public void disposeAll() {
-		disposeTexture("ball");
-		disposeTexture("ball-death");
-		disposeTexture("deflector");
-		disposeTexture("hud");
+		for(Map.Entry<String, Texture> entry : textures.entrySet()) {
+			if(entry.getKey() != null) {
+				entry.getValue().dispose();
+			}
+		}
 	}
 }

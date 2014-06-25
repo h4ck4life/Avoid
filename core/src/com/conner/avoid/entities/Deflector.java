@@ -1,10 +1,12 @@
 package com.conner.avoid.entities;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.conner.avoid.Application;
+import com.conner.avoid.utils.B2DVars;
 
 public class Deflector extends B2DSprite{
 
@@ -39,6 +41,18 @@ public class Deflector extends B2DSprite{
 		tail[0] = getPosition();
 	}
 	
+	@Override
+	public void render(SpriteBatch batch) {
+		batch.begin();
+		for(int i = 0; i < tail.length; i++) {
+			batch.draw(animation.getFrame(), 
+					tail[i].x * B2DVars.PPM - width / 2,
+					tail[i].y * B2DVars.PPM - height / 2
+			);
+		}
+		batch.end();
+		super.render(batch);
+	}
 	public boolean isAlive() {
 		return alive;
 	}

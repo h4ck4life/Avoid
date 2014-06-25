@@ -1,8 +1,10 @@
 package com.conner.avoid.entities;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.conner.avoid.Application;
@@ -11,65 +13,62 @@ public class HUD {
 
 	private Player player;
 	
-	private TextureRegion[] font;
-	private TextureRegion score;
 	private ShapeRenderer sr;
+	private BitmapFont font;
 	
 	public HUD(Player player) {
 		this.player = player;
 		sr = new ShapeRenderer();
-
-		Texture tex = Application.res.getTexture("hud");
-		
-		font = new TextureRegion[12];
-		for(int i = 0; i < 6; i++) {
-			font[i] = new TextureRegion(tex, 32 + i * 9, 16, 9, 9);
-		}
-		for(int i = 0; i < 6; i++) {
-			font[i + 6] = new TextureRegion(tex, 32 + i * 9, 25, 9, 9);
-		}
-		score = new TextureRegion(tex, 32, 34, 54, 9);
+		font = Application.font;
+		font.setScale(1f);
 	}
 	
-	public void render(SpriteBatch batch) {
-		
-		batch.begin();
-		batch.draw(score, 10, 220);
-		drawString(batch, player.getHealth() + "", 10, 10);
-		drawScore(batch, ":" + player.getScore(), 55, 220);
-		batch.end();
-		
-		if(player.getHealth() >= 0) {
-			sr.begin(ShapeType.Filled);
-			sr.setColor(1, 0, 0, 1);
-			sr.rect(80, 20, 540 * player.getHealth()/100, 20);
-			sr.end();
-		}
+	public void render(SpriteBatch sb) {
+		renderScore(sb);
+		renderPhaseBar(sb);
+		renderHealthBar(sb);
+	}
+	
+	private void renderScore(SpriteBatch sb) {
+		sb.begin();
+		font.draw(sb, "SCORE: " + player.getScore(), 10, 40);
+		sb.end();
+	}
+	private void renderPhaseBar(SpriteBatch sb) {
+		Gdx.gl20.glEnable(GL20.GL_BLEND);
+		Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		sr.begin(ShapeType.Filled);
+		sr.setColor(new Color(.2f, .2f, .45f, .75f));
+		sr.rect(0, Gdx.graphics.getHeight() - 15 * Application.SCALE, Gdx.graphics.getWidth() * player.getPhaseTick() / (float)player.getPhaseUpTime(), Gdx.graphics.getHeight());
+		sr.end();
+		Gdx.gl20.glDisable(GL20.GL_BLEND);
 		
 		sr.begin(ShapeType.Line);
 		sr.setColor(0, 0, 0, 1);
-		sr.rect(80, 20, 540, 20);
+		sr.rect(0, Gdx.graphics.getHeight() - 15 * Application.SCALE, Gdx.graphics.getWidth(), 1);
 		sr.end();
 	}
-	
-	private void drawString(SpriteBatch batch, String s, float x, float y) {
-		for(int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			if(c >= '0' && c <= '9') c -= '0';
-			else continue;
-			batch.draw(font[c], x + i * 9, y);
+	private void renderHealthBar(SpriteBatch sb) {
+		// Draw Health Bar
+		if(player.getPrevHealth() >= player.getHealth()) {
+			player.addPrevHealth(-0.4f);
+			Gdx.gl20.glEnable(GL20.GL_BLEND);
+			Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+			sr.begin(ShapeType.Filled);
+			sr.setColor(new Color(1, 0, 0, .6f));
+			sr.rect(0, 0, Gdx.graphics.getWidth() * player.getPrevHealth()/100, 15 * Application.SCALE);
+			sr.end();
+			Gdx.gl20.glDisable(GL20.GL_BLEND);
 		}
-	}
-	
-	private void drawScore(SpriteBatch batch, String s, float x, float y) {
-		for(int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			if(c >= '0' && c <= '9') c -= '0';
-			else if(c == ':') {
-				batch.draw(font[11], x + i * 9, y);
-				continue;
-			} else continue;
-			batch.draw(font[c], x + i * 9, y);
+		if(player.getHealth() >= 0) {
+			sr.begin(ShapeType.Filled);
+			sr.setColor(new Color(1, 0, 0, 1f));
+			sr.rect(0, 0, Gdx.graphics.getWidth() * player.getHealth()/100, 15 * Application.SCALE);
+			sr.end();
 		}
+		sr.begin(ShapeType.Line);
+		sr.setColor(0, 0, 0, 1);
+		sr.rect(0, 15 * Application.SCALE, Gdx.graphics.getWidth(), 1);
+		sr.end();	
 	}
 }

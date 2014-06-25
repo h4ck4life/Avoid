@@ -4,10 +4,14 @@ import static com.conner.avoid.utils.B2DVars.PPM;
 
 import java.util.Random;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +24,17 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.conner.avoid.Application;
 import com.conner.avoid.entities.Deflector;
@@ -53,11 +68,26 @@ public class Play extends GameState {
 	
 	// Game Vars
 	private boolean paused;
+	private Stage stage;
+	private Table table;
+	private Skin skin;
+	private TextButton buttonPause, buttonResume, buttonRestart, buttonReturn, buttonOptions;
+	private TextureAtlas atlas;
+	private BitmapFont black;
+	
+	// Touchpad Controller
+	private Touchpad touchpad;
+    private TouchpadStyle touchpadStyle;
+    private Skin touchpadSkin;
+    private Drawable touchBackground;
+    private Drawable touchKnob;
+    private boolean inControl = false;
 	
 	public Play(GameStateManager gsm) {
 		super(gsm);
 		
-		paused = false;
+		initPauseMenu();
+		initTouchpad();
 		
 		world = new World(new Vector2(0, 0f), true);
 		World.setVelocityThreshold(0f);
@@ -80,23 +110,150 @@ public class Play extends GameState {
 		// Create the hud
 		hud = new HUD(player);
 	}
+	
+	private void initTouchpad() {
+		//Create a touchpad skin    
+        touchpadSkin = new Skin();
+        //Set background image
+        touchpadSkin.add("touchBackground", new Texture("ui/touchBackground.png"));
+        //Set knob image
+        touchpadSkin.add("touchKnob", new Texture("ui/touchKnob.png"));
+        //Create TouchPad Style
+        touchpadStyle = new TouchpadStyle();
+        //Create Drawable's from TouchPad skin
+        touchBackground = touchpadSkin.getDrawable("touchBackground");
+        touchKnob = touchpadSkin.getDrawable("touchKnob");
+        //Apply the Drawables to the TouchPad Style
+        touchpadStyle.background = touchBackground;
+        touchpadStyle.knob = touchKnob;
+        //Create new TouchPad with the created style
+        touchpad = new Touchpad(10, touchpadStyle);
+        //setBounds(x,y,width,height)
+        touchpad.setBounds(0, 0, 110 * Application.SCALE, 110 * Application.SCALE);
+        touchpad.setVisible(false);
+        stage.addActor(touchpad);
 
+		Gdx.input.setInputProcessor(stage);
+	}
+	
+	private void initPauseMenu() {
+		paused = false;
+		
+		black = Application.font;
+		
+		atlas = new TextureAtlas("ui/button2.pack");
+		skin = new Skin(atlas);
+		
+		stage = new Stage();
+		
+		table = new Table(skin);
+		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		TextButtonStyle tbs = new TextButtonStyle();
+		tbs.up = skin.getDrawable("button.normal");
+		tbs.down = skin.getDrawable("button.pressed");
+		tbs.pressedOffsetX = 1;
+		tbs.pressedOffsetY = -1;
+		tbs.font = black;
+		black.setScale(Application.SCALE);
+		
+		buttonPause = new TextButton("ll", tbs);
+		buttonPause.setWidth(50 * Application.SCALE);
+		buttonPause.setPosition(Gdx.graphics.getWidth() - 100 * Application.SCALE, Gdx.graphics.getHeight() - 80 * Application.SCALE);
+		buttonPause.setVisible(true);
+		buttonPause.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				buttonPause.setDisabled(true);
+				buttonResume.setVisible(true);
+				buttonReturn.setVisible(true);
+				buttonRestart.setVisible(true);
+				paused = true;
+			}
+		});
+		buttonResume = new TextButton("Resume", tbs);
+		buttonResume.setVisible(false);
+		buttonResume.addListener(new ClickListener() { 
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				buttonPause.setDisabled(false);
+				buttonResume.setVisible(false);
+				buttonReturn.setVisible(false);
+				buttonRestart.setVisible(false);
+				paused = false;
+			}
+		});
+		buttonReturn = new TextButton("Main Menu", tbs);
+		buttonReturn.setVisible(false);
+		buttonReturn.addListener(new ClickListener() { 
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				paused = true;
+				gsm.setState(GameStateManager.MAINMENU);
+			}
+		});
+		buttonRestart = new TextButton("Retry", tbs);
+		buttonRestart.setVisible(false);
+		buttonRestart.addListener(new ClickListener() { 
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				paused = false;
+				world.destroyBody(player.getBody());
+				buttonResume.setVisible(false);
+				buttonReturn.setVisible(false);
+				buttonRestart.setVisible(false);
+				buttonPause.setDisabled(false);
+				createPlayer();
+			}
+		});
+		
+		table.add(buttonResume).width(200 * Application.SCALE).pad(30);
+		table.row();
+		table.add(buttonRestart).width(200 * Application.SCALE).pad(30);
+		table.row();
+		table.add(buttonReturn).width(200 * Application.SCALE).pad(30);
+		stage.addActor(buttonPause);
+		stage.addActor(table);
+	}
+	
 	@Override
 	public void handleInput() {
-		if((Gdx.input.isTouched() && Gdx.input.isTouched(2)) || InputHandler.isPressed(InputHandler.BUTTON_Z)) {
+		if(InputHandler.isPressed(InputHandler.BUTTON_Z)) {
 			paused = !paused;
 		}
 		if(!paused) {
-			if(player.isAlive() && Gdx.input.isTouched()) {
-				Vector3 test;
-				camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-				player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 50, (test.y / PPM - player.getBody().getPosition().y) * 50), true);
+			if(Gdx.input.isTouched() && player.isAlive()) {
+				if(!inControl) {
+					inControl = true;
+					touchpad.setPosition(Gdx.input.getX() - touchpad.getWidth()/2,  -Gdx.input.getY() + Gdx.graphics.getHeight() - touchpad.getHeight()/2);
+					touchpad.setVisible(true);
+					InputEvent et = new InputEvent(); 
+					et.setType(Type.touchDown);
+					et.setStageX(Gdx.input.getX());
+					et.setStageY(Gdx.input.getY());
+					touchpad.fire(et);
+					System.out.println("BUTTS");
+				} else {
+					player.getBody().setLinearVelocity(new Vector2(touchpad.getKnobPercentX() * 2.5f, touchpad.getKnobPercentY() * 2.5f));
+				}
+			} else {
+				inControl = false;
+				touchpad.setVisible(false);
 			}
+			
 			if((Gdx.input.isTouched() && Gdx.input.isTouched(1)) || InputHandler.isDown(InputHandler.BUTTON_X)) {
 				world.destroyBody(player.getBody());
 				createPlayer();
 			}
 		}
+		
+		
+		// OLD Control Scheme
+		//if(player.isAlive() && Gdx.input.isTouched()) {
+			//Vector3 test;
+			//camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+			//player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 20, (test.y / PPM - player.getBody().getPosition().y) * 20), true);
+		//}
 	}
 
 	private float accum = 0;
@@ -104,8 +261,11 @@ public class Play extends GameState {
 	
 	@Override
 	public void update(float dt) {
-		handleInput();
 		
+		stage.act(dt);
+		if(!buttonPause.isPressed()) {
+			handleInput();
+		}
 		if(!paused) {
 			world.step(dt, 6, 2);
 			
@@ -119,8 +279,6 @@ public class Play extends GameState {
 				}
 			}
 			bodies.clear();
-			
-			//if(!player.isAlive() && !player.isDying()) world.destroyBody(player.getBody());
 			
 			if(player.isAlive() || player.isDying()) 
 				player.update(dt);
@@ -139,8 +297,11 @@ public class Play extends GameState {
 			accum += dt;
 			if(accum > 3) {
 				accum = 0;
-				if(player.isAlive())
-					createDeflector(player.getPosition().x, player.getPosition().y);
+				if(player.isAlive()) {
+					for(int i = 0; i < player.getPhase()+1; i++) {
+						createDeflector(player.getPosition().x, player.getPosition().y);
+					}
+				}
 			}
 		}
 	}
@@ -171,26 +332,39 @@ public class Play extends GameState {
 		// Draw hud
 		batch.setProjectionMatrix(hudCamera.combined);
 		hud.render(batch);
-		
-		batch.begin();
 		if(paused) {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
 			ShapeRenderer sr = new ShapeRenderer();
 			sr.setProjectionMatrix(hudCamera.combined);
 			sr.begin(ShapeType.Filled);
 			sr.setColor(new Color(.5f, .5f, .5f, 0.5f));
-			sr.rect(0, 0, app.V_WIDTH, app.V_HEIGHT);
+			sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			sr.end();
+			Gdx.gl.glDisable(GL20.GL_BLEND);
 		}
-		batch.end();
+		
+		stage.draw();
+		
+		if(player.isPhaseUp()) {
+			if(player.getTick("levelUp") < 1f) {
+				Gdx.gl.glEnable(GL20.GL_BLEND);
+				ShapeRenderer sr = new ShapeRenderer();
+				sr.begin(ShapeType.Filled);
+				sr.setColor(new Color(1f, 1f, 1f, 1f - player.getTick("levelUp")));
+				sr.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+				sr.end();
+				Gdx.gl.glDisable(GL20.GL_BLEND);
+			} else {
+				player.phaseUp();
+			}
+		}
+		
 		// Draw box2d world
 		//b2dr.render(world, b2dCam.combined);
 	}
 
 	@Override
 	public void dispose() {
-		batch.dispose();
-		Application.res.disposeAll();
 	}
 	
 	private void createPlayer() {

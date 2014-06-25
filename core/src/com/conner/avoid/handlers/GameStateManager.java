@@ -3,16 +3,14 @@ package com.conner.avoid.handlers;
 import java.util.Stack;
 
 import com.conner.avoid.Application;
-import com.conner.avoid.states.GameState;
-import com.conner.avoid.states.HighscoreList;
-import com.conner.avoid.states.MainMenu;
-import com.conner.avoid.states.Play;
+import com.conner.avoid.states.*;
 
 public class GameStateManager {
 	private Application app;
 	
 	private Stack<GameState> states;
 
+	public static final int SPLASHSCREEN = -1;
 	public static final int MAINMENU = 0;
 	public static final int PLAY = 1;
 	public static final int HIGHSCORE = 2;
@@ -20,7 +18,7 @@ public class GameStateManager {
 	public GameStateManager(Application app) {
 		this.app = app;
 		states = new Stack<GameState>();
-		pushState(MAINMENU);
+		pushState(SPLASHSCREEN);
 	}
 	
 	public Application application() {
@@ -36,6 +34,7 @@ public class GameStateManager {
 	}
 	
 	private GameState getState(int state) {
+		if(state == SPLASHSCREEN) return new Splash(this);
 		if(state == MAINMENU) return new MainMenu(this);
 		if(state == PLAY) return new Play(this);
 		if(state == HIGHSCORE) return new HighscoreList(this);

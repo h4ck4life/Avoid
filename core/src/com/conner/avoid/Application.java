@@ -20,7 +20,7 @@ public class Application extends ApplicationAdapter {
 	public static final String TITLE = "Deflector";
 	public static final int V_WIDTH = 640;
 	public static final int V_HEIGHT = 360;
-	public static final int SCALE = 2;
+	public static int SCALE;
 	public static final float STEP = 1 / 60f;
 	
 	// Game Handler
@@ -28,31 +28,34 @@ public class Application extends ApplicationAdapter {
 	
 	// Resource Cache
 	public static Cache res;
+	public static BitmapFont font;
 	
 	// Scene vars
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private OrthographicCamera hudCamera;
-	private BitmapFont font;
 	
 	public void create() {
-		Gdx.input.setInputProcessor(new InputProcessor());
+		//Gdx.input.setInputProcessor(new InputProcessor());
 		batch = new SpriteBatch();
-		
+
 		// TODO: Load this into a loadstate for loading screen for resources
 		res = new Cache();
 		res.loadTexture("img/player.png", "ball");
 		res.loadTexture("img/player_death.png", "ball-death");
 		res.loadTexture("img/deflector.png", "deflector");
-		res.loadTexture("img/hud.png", "hud");
+		res.loadTexture("img/splash.png", "splash");
 		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, V_WIDTH, V_HEIGHT);
 		hudCamera = new OrthographicCamera();
 		hudCamera.setToOrtho(false, V_WIDTH, V_HEIGHT);
 		
+		font = new BitmapFont(Gdx.files.internal("font/32_black.fnt"), false);
+		
 		gsm = new GameStateManager(this);
-		font = new BitmapFont();	
+		
+		SCALE = ((Gdx.graphics.getWidth() * Gdx.graphics.getHeight()) / (1280 * 720));
 	}
 	
 	public void render() {		
@@ -62,8 +65,9 @@ public class Application extends ApplicationAdapter {
 	}
 	
 	public void dispose() {
+		res.disposeAll();
 		batch.dispose();
-		//res.disposeAll();
+		font.dispose();
 	}
 	
 	// Utility methods
