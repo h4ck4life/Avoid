@@ -37,7 +37,7 @@ public class Player extends B2DSprite {
 		ticks.put("phaseTick", 0f);
 		ticks.put("scoreTick", 0f);
 		phaseTimes = new int[] {40, 50, 70, 100, 200};
-		phaseTimes = new int[] {2, 3, 4, 5, 6};
+		//phaseTimes = new int[] {2, 3, 4, 5, 6};
 		
 		// Image/Animation
 		Texture tex = Application.res.getTexture("ball");

@@ -23,9 +23,6 @@ public class Deflector extends B2DSprite{
 		setAnimation(sprites, 1 / 12f);
 		
 		tail = new Vector2[10];
-		for(int i = 0; i < tail.length; i++) {
-			tail[i] = getPosition();
-		}
 		cooldown = 2f;
 		alive = false;
 	}
@@ -38,20 +35,26 @@ public class Deflector extends B2DSprite{
 			alive = true;
 			body.getFixtureList().get(1).setUserData("deflector-hit");
 		}
-		tail[0] = getPosition();
+
+//		tail[0] = getPosition();
+//		for(int i = tail.length - 1; i > 0; i--) {
+//			if(tail[i] == null)
+//				tail[i] = tail[i-1];
+//		}
 	}
 	
 	@Override
 	public void render(SpriteBatch batch) {
+		super.render(batch);
 		batch.begin();
 		for(int i = 0; i < tail.length; i++) {
-			batch.draw(animation.getFrame(), 
-					tail[i].x * B2DVars.PPM - width / 2,
-					tail[i].y * B2DVars.PPM - height / 2
-			);
+			if(tail[i] != null)
+				batch.draw(animation.getFrame(), 
+						tail[i].x * B2DVars.PPM - width / 2,
+						tail[i].y * B2DVars.PPM - height / 2
+				);
 		}
 		batch.end();
-		super.render(batch);
 	}
 	public boolean isAlive() {
 		return alive;

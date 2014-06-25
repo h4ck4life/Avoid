@@ -232,7 +232,6 @@ public class Play extends GameState {
 					et.setStageX(Gdx.input.getX());
 					et.setStageY(Gdx.input.getY());
 					touchpad.fire(et);
-					System.out.println("BUTTS");
 				} else {
 					player.getBody().setLinearVelocity(new Vector2(touchpad.getKnobPercentX() * 2.5f, touchpad.getKnobPercentY() * 2.5f));
 				}
