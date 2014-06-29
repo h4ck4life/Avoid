@@ -4,7 +4,6 @@ import static com.conner.avoid.utils.B2DVars.PPM;
 
 import java.util.Random;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -36,6 +34,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.conner.avoid.Application;
 import com.conner.avoid.entities.Deflector;
 import com.conner.avoid.entities.HUD;
@@ -108,32 +107,31 @@ public class Play extends GameState {
 		map = new LevelMap(world, "test_map");
 		
 		// Create the hud
-		hud = new HUD(player);
+		hud = new HUD(stage, player);
 	}
 	
 	private void initTouchpad() {
-		//Create a touchpad skin    
+		// Create a touchpad skin    
         touchpadSkin = new Skin();
-        //Set background image
         touchpadSkin.add("touchBackground", new Texture("ui/touchBackground.png"));
-        //Set knob image
         touchpadSkin.add("touchKnob", new Texture("ui/touchKnob.png"));
-        //Create TouchPad Style
-        touchpadStyle = new TouchpadStyle();
-        //Create Drawable's from TouchPad skin
+        
+        // Touchpad Images
         touchBackground = touchpadSkin.getDrawable("touchBackground");
         touchKnob = touchpadSkin.getDrawable("touchKnob");
-        //Apply the Drawables to the TouchPad Style
+        
+        // Create TouchPad Style
+        touchpadStyle = new TouchpadStyle();
         touchpadStyle.background = touchBackground;
         touchpadStyle.knob = touchKnob;
-        //Create new TouchPad with the created style
-        touchpad = new Touchpad(10, touchpadStyle);
-        //setBounds(x,y,width,height)
-        touchpad.setBounds(0, 0, 110 * Application.SCALE, 110 * Application.SCALE);
+        
+        //Create new TouchPad with style
+        touchpad = new Touchpad(3, touchpadStyle);
+        touchpad.setBounds(0, 0, 110, 110);
         touchpad.setVisible(false);
+        
+        // Add touchpad to stage8
         stage.addActor(touchpad);
-
-		Gdx.input.setInputProcessor(stage);
 	}
 	
 	private void initPauseMenu() {
@@ -141,48 +139,54 @@ public class Play extends GameState {
 		
 		black = Application.font;
 		
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+
 		atlas = new TextureAtlas("ui/button2.pack");
 		skin = new Skin(atlas);
-		
-		stage = new Stage();
-		
 		table = new Table(skin);
 		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
+		// Initialize button styles
 		TextButtonStyle tbs = new TextButtonStyle();
 		tbs.up = skin.getDrawable("button.normal");
 		tbs.down = skin.getDrawable("button.pressed");
 		tbs.pressedOffsetX = 1;
 		tbs.pressedOffsetY = -1;
 		tbs.font = black;
-		black.setScale(Application.SCALE);
+		black.setScale(1f);
 		
+		// In-game Pause Button
 		buttonPause = new TextButton("ll", tbs);
-		buttonPause.setWidth(50 * Application.SCALE);
-		buttonPause.setPosition(Gdx.graphics.getWidth() - 100 * Application.SCALE, Gdx.graphics.getHeight() - 80 * Application.SCALE);
+		buttonPause.setWidth(50);
+		buttonPause.setPosition(Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 80);
 		buttonPause.setVisible(true);
 		buttonPause.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				buttonPause.setDisabled(true);
+				buttonPause.setVisible(false);
 				buttonResume.setVisible(true);
 				buttonReturn.setVisible(true);
 				buttonRestart.setVisible(true);
 				paused = true;
 			}
 		});
+		
+		// In-pause Resume
 		buttonResume = new TextButton("Resume", tbs);
 		buttonResume.setVisible(false);
 		buttonResume.addListener(new ClickListener() { 
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				buttonPause.setDisabled(false);
+				buttonPause.setVisible(true);
 				buttonResume.setVisible(false);
 				buttonReturn.setVisible(false);
 				buttonRestart.setVisible(false);
 				paused = false;
 			}
 		});
+		
+		// In-pause Return to main menu
 		buttonReturn = new TextButton("Main Menu", tbs);
 		buttonReturn.setVisible(false);
 		buttonReturn.addListener(new ClickListener() { 
@@ -192,6 +196,8 @@ public class Play extends GameState {
 				gsm.setState(GameStateManager.MAINMENU);
 			}
 		});
+		
+		// In-pause Restart Game
 		buttonRestart = new TextButton("Retry", tbs);
 		buttonRestart.setVisible(false);
 		buttonRestart.addListener(new ClickListener() { 
@@ -202,25 +208,23 @@ public class Play extends GameState {
 				buttonResume.setVisible(false);
 				buttonReturn.setVisible(false);
 				buttonRestart.setVisible(false);
-				buttonPause.setDisabled(false);
+				buttonPause.setVisible(true);
 				createPlayer();
 			}
 		});
 		
-		table.add(buttonResume).width(200 * Application.SCALE).pad(30);
+		// Add everything to the stage
+		table.add(buttonResume).width(200).pad(30);
 		table.row();
-		table.add(buttonRestart).width(200 * Application.SCALE).pad(30);
+		table.add(buttonRestart).width(200).pad(30);
 		table.row();
-		table.add(buttonReturn).width(200 * Application.SCALE).pad(30);
+		table.add(buttonReturn).width(200).pad(30);
 		stage.addActor(buttonPause);
 		stage.addActor(table);
 	}
 	
 	@Override
 	public void handleInput() {
-		if(InputHandler.isPressed(InputHandler.BUTTON_Z)) {
-			paused = !paused;
-		}
 		if(!paused) {
 			if(Gdx.input.isTouched() && player.isAlive()) {
 				if(!inControl) {
@@ -247,7 +251,7 @@ public class Play extends GameState {
 		}
 		
 		
-		// OLD Control Scheme
+		// OLD Touch Based Control Scheme
 		//if(player.isAlive() && Gdx.input.isTouched()) {
 			//Vector3 test;
 			//camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
@@ -260,7 +264,6 @@ public class Play extends GameState {
 	
 	@Override
 	public void update(float dt) {
-		
 		stage.act(dt);
 		if(!buttonPause.isPressed()) {
 			handleInput();
@@ -362,9 +365,13 @@ public class Play extends GameState {
 		//b2dr.render(world, b2dCam.combined);
 	}
 
-	@Override
-	public void dispose() {
+	@Override 
+	public void resize(int w, int h) {
+		stage.getViewport().update(w, h, false);
 	}
+	
+	@Override
+	public void dispose() { }
 	
 	private void createPlayer() {
 		BodyDef bdef = new BodyDef();
@@ -388,7 +395,7 @@ public class Play extends GameState {
 		player = new Player(body);
 		body.setUserData(player);
 		
-		hud = new HUD(player);
+		hud = new HUD(stage, player);
 	}
 	
 	private void createDeflector(float x, float y) {

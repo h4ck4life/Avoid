@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.conner.avoid.Application;
 import com.conner.avoid.handlers.GameStateManager;
 
@@ -28,24 +29,26 @@ public class MainMenu extends GameState {
 
 		black = Application.font;
 		
+		// Init Stage
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+
+		// Init ui graphics
 		atlas = new TextureAtlas("ui/button2.pack");
 		skin = new Skin(atlas);
-		
-		stage = new Stage();
-
-		Gdx.input.setInputProcessor(stage);
-		
 		table = new Table(skin);
 		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
+		// Init button styles
 		TextButtonStyle tbs = new TextButtonStyle();
 		tbs.up = skin.getDrawable("button.normal");
 		tbs.down = skin.getDrawable("button.pressed");
 		tbs.pressedOffsetX = 1;
 		tbs.pressedOffsetY = -1;
 		tbs.font = black;
-		black.setScale(Application.SCALE);
+		black.setScale(1f);
 		
+		// Play Button
 		buttonPlay = new TextButton("Play", tbs);
 		buttonPlay.addListener(new ClickListener() {
 			@Override
@@ -54,6 +57,8 @@ public class MainMenu extends GameState {
 				gsm.setState(GameStateManager.PLAY);
 			}
 		});
+		
+		// Quit button
 		buttonExit = new TextButton("Quit", tbs);
 		buttonExit.addListener(new ClickListener() {
 			@Override
@@ -62,16 +67,20 @@ public class MainMenu extends GameState {
 			}
 		});
 		
+		// Add actors to stage
 		table.add(buttonPlay).width(300).pad(30);
 		table.row();
-		table.add(buttonExit).width(300).pad(30);
+		table.add(buttonExit).width(300);
 		stage.addActor(table);
 	}
 
 	@Override
-	public void handleInput() {
-		
+	public void resize(int w, int h) {
+		stage.getViewport().update(w, h, true);	
 	}
+	
+	@Override
+	public void handleInput() { }
 
 	@Override
 	public void update(float dt) {
@@ -88,6 +97,5 @@ public class MainMenu extends GameState {
 	}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() { }
 }

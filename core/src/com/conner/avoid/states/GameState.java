@@ -2,6 +2,7 @@ package com.conner.avoid.states;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.conner.avoid.Application;
 import com.conner.avoid.handlers.GameStateManager;
 
@@ -24,5 +25,6 @@ public abstract class GameState {
 	public abstract void handleInput();
 	public abstract void update(float delta);
 	public abstract void render();
+	public abstract void resize(int w, int h);
 	public abstract void dispose();
 }

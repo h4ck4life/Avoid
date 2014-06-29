@@ -35,19 +35,18 @@ public class Splash extends GameState {
 		// Establish splash sequence
 		Tween.set(splash, SpriteAccessor.ALPHA).target(0).start(tweenMgr);
 		Tween.to(splash, SpriteAccessor.ALPHA, .5f).target(1)
-			.repeatYoyo(1, 1)
-			.setCallback(new TweenCallback() {
-				@Override
-				public void onEvent(int arg0, BaseTween<?> arg1) {
-					gsm.setState(GameStateManager.MAINMENU);
-				}
-			})
-			.start(tweenMgr);
+		   .repeatYoyo(1, 1)
+		   .setCallback(new TweenCallback() {
+			   @Override
+			   public void onEvent(int arg0, BaseTween<?> arg1) {
+				   gsm.setState(GameStateManager.MAINMENU);
+			   }
+		   })
+		   .start(tweenMgr);
 	}
 
 	@Override
-	public void handleInput() {
-	}
+	public void handleInput() { }
 
 	@Override
 	public void update(float delta) {
@@ -67,6 +66,7 @@ public class Splash extends GameState {
 	}
 
 	@Override
-	public void dispose() {
-	}
+	public void dispose() { }
+	@Override
+	public void resize(int w, int h) { }
 }

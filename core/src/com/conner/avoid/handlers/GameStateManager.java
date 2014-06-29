@@ -33,6 +33,10 @@ public class GameStateManager {
 		states.peek().render();
 	}
 	
+	public void resize(int w, int h) {
+		states.peek().resize(w, h);
+	}
+	
 	private GameState getState(int state) {
 		if(state == SPLASHSCREEN) return new Splash(this);
 		if(state == MAINMENU) return new MainMenu(this);

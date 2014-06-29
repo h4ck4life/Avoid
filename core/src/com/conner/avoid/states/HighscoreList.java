@@ -24,4 +24,8 @@ public class HighscoreList extends GameState {
 	@Override
 	public void dispose() {
 	}
+	
+	@Override
+	public void resize(int w, int h) {
+	}
 }
