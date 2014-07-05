@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.conner.avoid.Application;
 import com.conner.avoid.handlers.GameStateManager;
 
@@ -30,7 +31,7 @@ public class MainMenu extends GameState {
 		black = Application.font;
 		
 		// Init Stage
-		stage = new Stage();
+		stage = new Stage(new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		Gdx.input.setInputProcessor(stage);
 
 		// Init ui graphics
@@ -46,7 +47,7 @@ public class MainMenu extends GameState {
 		tbs.pressedOffsetX = 1;
 		tbs.pressedOffsetY = -1;
 		tbs.font = black;
-		black.setScale(1f);
+		black.setScale(Gdx.graphics.getDensity());
 		
 		// Play Button
 		buttonPlay = new TextButton("Play", tbs);
@@ -68,9 +69,9 @@ public class MainMenu extends GameState {
 		});
 		
 		// Add actors to stage
-		table.add(buttonPlay).width(300).pad(30);
+		table.add(buttonPlay).width(Gdx.graphics.getWidth()/4 * Gdx.graphics.getDensity()).height(100 * Gdx.graphics.getDensity()).pad(30 * Gdx.graphics.getDensity());
 		table.row();
-		table.add(buttonExit).width(300);
+		table.add(buttonExit).width(Gdx.graphics.getWidth()/4 * Gdx.graphics.getDensity()).height(100 * Gdx.graphics.getDensity());
 		stage.addActor(table);
 	}
 

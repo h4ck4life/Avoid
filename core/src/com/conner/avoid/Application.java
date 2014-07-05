@@ -70,8 +70,8 @@ public class Application extends ApplicationAdapter {
 		
 		viewport = new FitViewport(V_WIDTH, V_HEIGHT, camera);
 		hudViewport = new FitViewport(V_WIDTH, V_HEIGHT, hudCamera);
-		
 	}
+	
 	// Application Render/Update
 	public void render() {		
 		gsm.update(STEP);

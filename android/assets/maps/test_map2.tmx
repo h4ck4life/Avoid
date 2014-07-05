@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="40" height="24" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="../img/tilesets/default.png" width="128" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="1"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="blocking" value="0"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="blocking" value="0"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="blocking" value="1"/>
+    <property name="isblock" value="0"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="map" width="40" height="24">
+  <data encoding="base64" compression="zlib">
+   eJzVl0sOgCAMRDEKev8TCztCWmbKJ9bFbGzaPsaCGEMIj1PFrCsrOdVZ8R2CUhXTaqyIab1bPrQeiV2Kj+RK7Ba+urbUp+c3yrXyof6Ih+Ht+c7w7Zh3xjONj83dwaOJ5WN7MHNhUctn2V+WvqN1Gf8YP0afIWbkH+sRy4dykX/e+f72fnvMXvaH1dud54tlvmZlPZ+9f9/+dD/Q1uflfoUYv7qftmLmcUVM6z17vuxW4Sv/cLdTFbYXpiITYQ==
+  </data>
+ </layer>
+</map>

@@ -5,6 +5,7 @@ import static com.conner.avoid.utils.B2DVars.PPM;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -34,7 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.conner.avoid.Application;
 import com.conner.avoid.entities.Deflector;
 import com.conner.avoid.entities.HUD;
@@ -48,6 +49,7 @@ import com.conner.avoid.utils.B2DVars;
 public class Play extends GameState {
 
 	private World world;
+	private ScreenViewport worldView; // TODO: learn how to utilize this with .setPixelsPerUnit scale 1/PPM
 	private GameContactListener cl;
 	private Box2DDebugRenderer b2dr;
 	
@@ -89,8 +91,9 @@ public class Play extends GameState {
 		initTouchpad();
 		
 		world = new World(new Vector2(0, 0f), true);
-		World.setVelocityThreshold(0f);
+		World.setVelocityThreshold(0f); // Fix: http://www.badlogicgames.com/wordpress/?p=2030
 		world.setContactListener(cl = new GameContactListener());
+		camera.zoom = 1.3f;
 		
 		b2dr = new Box2DDebugRenderer();
 		
@@ -104,7 +107,7 @@ public class Play extends GameState {
 		deflects = new Array<Deflector>();
 		
 		// Create the map
-		map = new LevelMap(world, "test_map");
+		map = new LevelMap(world, "test_map2");
 		
 		// Create the hud
 		hud = new HUD(stage, player);
@@ -145,7 +148,7 @@ public class Play extends GameState {
 		atlas = new TextureAtlas("ui/button2.pack");
 		skin = new Skin(atlas);
 		table = new Table(skin);
-		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		table.setBounds(0, 0, stage.getWidth(), stage.getHeight());
 		
 		// Initialize button styles
 		TextButtonStyle tbs = new TextButtonStyle();
@@ -248,6 +251,9 @@ public class Play extends GameState {
 				world.destroyBody(player.getBody());
 				createPlayer();
 			}
+
+			if(Gdx.input.isKeyPressed(Keys.A)) camera.zoom += .1f;
+			if(Gdx.input.isKeyPressed(Keys.S)) camera.zoom -= .1f;
 		}
 		
 		
@@ -293,7 +299,7 @@ public class Play extends GameState {
 			if(score_accum > 1) {
 				score_accum = 0;
 				if(player.isAlive()) 
-					player.addPoints(1);
+					player.addPoints(5);
 			}
 			
 			accum += dt;
@@ -371,7 +377,9 @@ public class Play extends GameState {
 	}
 	
 	@Override
-	public void dispose() { }
+	public void dispose() { 
+		world.dispose();
+	}
 	
 	private void createPlayer() {
 		BodyDef bdef = new BodyDef();
