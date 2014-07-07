@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.conner.avoid.Application;
+import com.conner.avoid.states.HighscoreList;
 
 public class Player extends B2DSprite {
 
@@ -57,6 +58,7 @@ public class Player extends B2DSprite {
 		}
 		if(dying && animation.getTimesPlayed() >= 1) {
 			dying = false;
+			HighscoreList.updateHighscores(score);
 		}
 	}
 	public void phaseUp() {

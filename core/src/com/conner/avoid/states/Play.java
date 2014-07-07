@@ -108,7 +108,7 @@ public class Play extends GameState {
 		deflects = new Array<Deflector>();
 		
 		// Create the map
-		map = new LevelMap(world, "test_map2");
+		map = new LevelMap(world, "test_map");
 		
 		// Create the hud
 		hud = new HUD(stage, player);

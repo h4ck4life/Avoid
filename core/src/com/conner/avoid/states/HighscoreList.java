@@ -78,7 +78,6 @@ public class HighscoreList extends GameState {
 		list_Highscores = new ScrollPane(contents);
 		list_Highscores.setWidth(Gdx.graphics.getWidth());
 		
-		
 		table.top();
 		table.add(title);
 		table.row();
@@ -91,25 +90,13 @@ public class HighscoreList extends GameState {
 		LabelStyle ls = new LabelStyle();
 		ls.font = Application.font;
 		title = new Label("Highscore List: ", ls);
-		ArrayList<Integer> scores = new ArrayList<Integer>();
-//		highscores = 
-//		if(file.exists()) {
-//			String[] fileList = file.readString().split("\n");
-//			for(int i = 0; i < 10; i++) {
-//				highscoreEntry = new Label(((i+1) + ". " + fileList[i]), ls);
-//				listToPopulate.top();
-//				listToPopulate.add(highscoreEntry).pad(20f);
-//				listToPopulate.row();
-//			}
-//		} else {
-//			for(int i = 0; i < 10; i++) {
-//				file.writeString(0+"\n", true);
-//				highscoreEntry = new Label(((1+1) + ". " + 0), ls);
-//				listToPopulate.top();
-//				listToPopulate.add(highscoreEntry).pad(20f);
-//				listToPopulate.row();
-//			}
-//		}
+		ArrayList<Integer> scores = getHighscores();
+		for(int i = 0; i < 10; i++) {
+			highscoreEntry = new Label(((i+1) + ". " + scores.get(i)), ls);
+			listToPopulate.top();
+			listToPopulate.add(highscoreEntry).pad(20f);
+			listToPopulate.row();
+		}
 		return scores;
 	}
 	
@@ -119,7 +106,7 @@ public class HighscoreList extends GameState {
 		if(file.exists()) {
 			String[] fileList = file.readString().split("\n");
 			for(String s : fileList) {
-				scores.add(Integer.parseInt(s));
+				scores.add(Integer.parseInt(s.substring(0, s.length())));
 			}
 		} else {
 			for(int i = 0; i < 10; i++) {
@@ -140,6 +127,17 @@ public class HighscoreList extends GameState {
 		}
 		if(found != -1) {
 			scores = getHighscores();
+			scores.add(found, newScore);
+			scores.remove(scores.size()-1);
+			writeHighscores(scores);
+		}
+	}
+	
+	public static void writeHighscores(ArrayList<Integer> scores) {
+		FileHandle file = Gdx.files.local("data/highscores.txt");
+		file.delete();
+		for(int score : scores) {
+			file.writeString(score+"\n", true);
 		}
 	}
 	
