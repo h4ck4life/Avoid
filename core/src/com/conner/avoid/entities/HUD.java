@@ -77,7 +77,7 @@ public class HUD {
 			// Draw bar
 			sr.begin(ShapeType.Filled);
 			sr.setColor(new Color(1, 0, 0, .6f));
-			sr.rect(0, 0, Gdx.graphics.getWidth() * player.getPrevHealth()/100, 15);
+			sr.rect(0, 0, stage.getWidth() * player.getPrevHealth()/100, 15);
 			sr.end();
 			
 			// Disable Alpha Blending
@@ -88,14 +88,14 @@ public class HUD {
 		if(player.getHealth() >= 0) {
 			sr.begin(ShapeType.Filled);
 			sr.setColor(new Color(1, 0, 0, 1f));
-			sr.rect(0, 0, Gdx.graphics.getWidth() * player.getHealth()/100, 15);
+			sr.rect(0, 0, stage.getWidth() * player.getHealth()/100, 15);
 			sr.end();
 		}
 		
 		// Draw container line
 		sr.begin(ShapeType.Line);
 		sr.setColor(0, 0, 0, 1);
-		sr.rect(0, 15, Gdx.graphics.getWidth(), 1);
+		sr.rect(0, 15, stage.getWidth(), 1);
 		sr.end();	
 	}
 }

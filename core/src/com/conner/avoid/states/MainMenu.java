@@ -1,27 +1,30 @@
 package com.conner.avoid.states;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.conner.avoid.Application;
 import com.conner.avoid.handlers.GameStateManager;
+
 
 public class MainMenu extends GameState {
 
 	private Stage stage;
 	private Table table;
 	private Skin skin;
-	private TextButton buttonPlay, buttonExit;
+	private Label title;
+	private TextButton buttonPlay, buttonHS, buttonExit;
 	private TextureAtlas atlas;
 	private BitmapFont black;
 	
@@ -31,7 +34,7 @@ public class MainMenu extends GameState {
 		black = Application.font;
 		
 		// Init Stage
-		stage = new Stage(new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 
 		// Init ui graphics
@@ -39,6 +42,7 @@ public class MainMenu extends GameState {
 		skin = new Skin(atlas);
 		table = new Table(skin);
 		table.setBounds(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		stage.addActor(table);
 		
 		// Init button styles
 		TextButtonStyle tbs = new TextButtonStyle();
@@ -46,8 +50,14 @@ public class MainMenu extends GameState {
 		tbs.down = skin.getDrawable("button.pressed");
 		tbs.pressedOffsetX = 1;
 		tbs.pressedOffsetY = -1;
+		black.setScale(2f);
 		tbs.font = black;
-		black.setScale(Gdx.graphics.getDensity());
+		
+		// Title Label
+		LabelStyle ls = new LabelStyle();
+		ls.font = black;
+		
+		title = new Label("DEFLECTOR", ls);
 		
 		// Play Button
 		buttonPlay = new TextButton("Play", tbs);
@@ -56,6 +66,16 @@ public class MainMenu extends GameState {
 			public void clicked(InputEvent event, float x, float y) {
 				stage.clear();
 				gsm.setState(GameStateManager.PLAY);
+			}
+		});
+		
+		// Play Button
+		buttonHS = new TextButton("Highscores", tbs);
+		buttonHS.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				stage.clear();
+				gsm.setState(GameStateManager.HIGHSCORE);
 			}
 		});
 		
@@ -69,15 +89,20 @@ public class MainMenu extends GameState {
 		});
 		
 		// Add actors to stage
-		table.add(buttonPlay).width(Gdx.graphics.getWidth()/4 * Gdx.graphics.getDensity()).height(100 * Gdx.graphics.getDensity()).pad(30 * Gdx.graphics.getDensity());
+		table.top();
+		table.add(title).pad(100);
 		table.row();
-		table.add(buttonExit).width(Gdx.graphics.getWidth()/4 * Gdx.graphics.getDensity()).height(100 * Gdx.graphics.getDensity());
-		stage.addActor(table);
+		table.bottom();
+		table.add(buttonPlay).width(Gdx.graphics.getWidth() / 3).height(Gdx.graphics.getHeight() / 8).padBottom(30 * Gdx.graphics.getDensity());
+		table.row();
+		table.add(buttonHS).width(Gdx.graphics.getWidth() / 3).height(Gdx.graphics.getHeight() / 8).padBottom(30 * Gdx.graphics.getDensity());
+		table.row();
+		table.add(buttonExit).width(Gdx.graphics.getWidth() / 3).height(Gdx.graphics.getHeight() / 8).padBottom(70 * Gdx.graphics.getDensity());
 	}
 
 	@Override
 	public void resize(int w, int h) {
-		stage.getViewport().update(w, h, true);	
+		stage.getViewport().update(w, h, true);
 	}
 	
 	@Override
@@ -98,5 +123,7 @@ public class MainMenu extends GameState {
 	}
 
 	@Override
-	public void dispose() { }
+	public void dispose() { 
+		stage.dispose();
+	}
 }

@@ -2,6 +2,7 @@ package com.conner.avoid;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -29,6 +30,7 @@ public class Application extends ApplicationAdapter {
 	
 	// Resource Cache
 	public static Cache res;
+	public static Preferences prefs;
 	public static BitmapFont font;
 	
 	// Scene vars
@@ -42,6 +44,7 @@ public class Application extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(new InputProcessor());
 
 		loadResources();
+		loadSettings();
 		initCameras();
 		
 		gsm = new GameStateManager(this);
@@ -59,6 +62,10 @@ public class Application extends ApplicationAdapter {
 		res.loadTexture("img/splash.png", "splash");
 		
 		font = new BitmapFont(Gdx.files.internal("font/32_black.fnt"), false);
+	}
+	
+	private void loadSettings() {
+		// TODO: Settings Menu
 	}
 	
 	public void initCameras() {

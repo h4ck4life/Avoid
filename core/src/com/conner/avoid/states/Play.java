@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -93,7 +94,7 @@ public class Play extends GameState {
 		world = new World(new Vector2(0, 0f), true);
 		World.setVelocityThreshold(0f); // Fix: http://www.badlogicgames.com/wordpress/?p=2030
 		world.setContactListener(cl = new GameContactListener());
-		camera.zoom = 1.3f;
+		camera.zoom = 1f;
 		
 		b2dr = new Box2DDebugRenderer();
 		
@@ -229,7 +230,14 @@ public class Play extends GameState {
 	@Override
 	public void handleInput() {
 		if(!paused) {
-			if(Gdx.input.isTouched() && player.isAlive()) {
+			// OLD Touch Based Control Scheme
+			if(player.isAlive() && Gdx.input.isTouched()) {
+				Vector3 test;
+				camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+				player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 20, (test.y / PPM - player.getBody().getPosition().y) * 20), true);
+			}
+			
+			if(Gdx.input.isTouched() && false && player.isAlive()) {
 				if(!inControl) {
 					inControl = true;
 					touchpad.setPosition(Gdx.input.getX() - touchpad.getWidth()/2,  -Gdx.input.getY() + Gdx.graphics.getHeight() - touchpad.getHeight()/2);
@@ -257,12 +265,7 @@ public class Play extends GameState {
 		}
 		
 		
-		// OLD Touch Based Control Scheme
-		//if(player.isAlive() && Gdx.input.isTouched()) {
-			//Vector3 test;
-			//camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-			//player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 20, (test.y / PPM - player.getBody().getPosition().y) * 20), true);
-		//}
+		
 	}
 
 	private float accum = 0;
@@ -373,12 +376,13 @@ public class Play extends GameState {
 
 	@Override 
 	public void resize(int w, int h) {
-		stage.getViewport().update(w, h, false);
+		stage.getViewport().update(w, h, true);
 	}
 	
 	@Override
 	public void dispose() { 
 		world.dispose();
+		stage.dispose();
 	}
 	
 	private void createPlayer() {
