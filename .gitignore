@@ -65,3 +65,5 @@ nb-configuration.xml
 
 .gradle
 build/
+
+desktop/data/highscores.txt

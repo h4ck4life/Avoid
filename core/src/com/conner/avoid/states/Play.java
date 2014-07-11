@@ -56,6 +56,9 @@ public class Play extends GameState {
 	
 	private OrthographicCamera b2dCam;
 	
+	private float accum = 0;
+	private float score_accum = 0;
+	
 	// HUD
 	private HUD hud;
 	
@@ -231,13 +234,13 @@ public class Play extends GameState {
 	public void handleInput() {
 		if(!paused) {
 			// OLD Touch Based Control Scheme
-			if(player.isAlive() && Gdx.input.isTouched()) {
-				Vector3 test;
-				camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-				player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 20, (test.y / PPM - player.getBody().getPosition().y) * 20), true);
-			}
+//			if(player.isAlive() && Gdx.input.isTouched()) {
+//				Vector3 test;
+//				camera.unproject(test = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+//				player.getBody().applyForceToCenter(new Vector2((test.x / PPM - player.getBody().getPosition().x) * 20, (test.y / PPM - player.getBody().getPosition().y) * 20), true);
+//			}
 			
-			if(Gdx.input.isTouched() && false && player.isAlive()) {
+			if(Gdx.input.isTouched() && player.isAlive()) {
 				if(!inControl) {
 					inControl = true;
 					touchpad.setPosition(Gdx.input.getX() - touchpad.getWidth()/2,  -Gdx.input.getY() + Gdx.graphics.getHeight() - touchpad.getHeight()/2);
@@ -255,7 +258,7 @@ public class Play extends GameState {
 				touchpad.setVisible(false);
 			}
 			
-			if((Gdx.input.isTouched() && Gdx.input.isTouched(1)) || InputHandler.isDown(InputHandler.BUTTON_X)) {
+			if(InputHandler.isDown(InputHandler.BUTTON_X)) {
 				world.destroyBody(player.getBody());
 				createPlayer();
 			}
@@ -263,13 +266,7 @@ public class Play extends GameState {
 			if(Gdx.input.isKeyPressed(Keys.A)) camera.zoom += .1f;
 			if(Gdx.input.isKeyPressed(Keys.S)) camera.zoom -= .1f;
 		}
-		
-		
-		
 	}
-
-	private float accum = 0;
-	private float score_accum = 0;
 	
 	@Override
 	public void update(float dt) {

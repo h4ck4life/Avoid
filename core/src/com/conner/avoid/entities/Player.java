@@ -37,7 +37,7 @@ public class Player extends B2DSprite {
 		ticks = new HashMap<String, Float>();
 		ticks.put("phaseTick", 0f);
 		ticks.put("scoreTick", 0f);
-		phaseTimes = new int[] {40, 50, 70, 100, 200};
+		phaseTimes = new int[] {20, 40, 50, 50, 200};
 		//phaseTimes = new int[] {2, 3, 4, 5, 6};
 		
 		// Image/Animation

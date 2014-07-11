@@ -54,7 +54,7 @@ public class LevelMap {
 				
 				MapProperties props = cell.getTile().getProperties();
 				
-				if(props.get("blocking").equals("1")) {
+				if(props.get("blocking") != null && props.get("blocking").equals("1")) {
 					// Create the tile in the physical world
 					bdef.type = BodyType.StaticBody;
 					bdef.position.set(

@@ -95,7 +95,7 @@ public class HUD {
 		// Draw container line
 		sr.begin(ShapeType.Line);
 		sr.setColor(0, 0, 0, 1);
-		sr.rect(0, 15, stage.getWidth(), 1);
+		sr.line(0, 15, stage.getWidth(), 15);
 		sr.end();	
 	}
 }
